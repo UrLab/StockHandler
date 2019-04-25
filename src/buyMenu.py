@@ -4,12 +4,12 @@ from pygame.locals import *
 from constants import *
 
 class BasketElement(object):
-    def __init__(self, name, price, image):
+    def __init__(self, name, price, image="imgs/products/Not_Found.png"):
         self.name = name
-        self.price = int(price)
+        self.price = float(price)
 
-        self.nameImage = fonts["30"].render(self.name, 1, (0, 0, 0))
-        self.priceImage = fonts["30"].render(str(self.price)+"€", 1, (0, 0, 0))
+        self.nameImage = fonts["20"].render(self.name, 1, (0, 0, 0))
+        self.priceImage = fonts["20"].render(str(self.price)+"€", 1, (0, 0, 0))
         self.image = pygame.image.load(image)
         coef = self.image.get_size()[1]/50
         coef2 = self.image.get_size()[1]/120
@@ -19,13 +19,13 @@ class BasketElement(object):
     def draw(self, screen, nb, isLast=False):
         if not isLast:
             screen.blit(self.scaledImage, (312, 75+(nb+1)*50))
-            screen.blit(self.nameImage,   (355, 80+(nb+1)*50))
+            screen.blit(self.nameImage,   (312+self.scaledImage.get_size()[0], 80+(nb+1)*50))
             screen.blit(self.priceImage,  (700-self.priceImage.get_size()[0], 80+(nb+1)*50))
             pygame.draw.rect(screen, (0, 0, 0), pygame.Rect((312, 75+(nb+1)*50), (400, 51)), 1)
         else:
-            screen.blit(self.nameImage,   (400, 95+(nb+1)*50))
-            screen.blit(self.priceImage,  (700-self.priceImage.get_size()[0], 95+(nb+1)*50))
-            screen.blit(self.image, (312, 75+(nb+1)*50))
+            screen.blit(self.image,      (312, 75+(nb+1)*50))
+            screen.blit(self.nameImage,  (312+self.image.get_size()[0], 95+(nb+1)*50))
+            screen.blit(self.priceImage, (700-self.priceImage.get_size()[0], 95+(nb+1)*50))
             pygame.draw.rect(screen, (0, 0, 0), pygame.Rect((312, 75+(nb+1)*50), (400, 120)), 1)
 
 class BuyMenu(object):
@@ -34,6 +34,8 @@ class BuyMenu(object):
         self.basket = []
         self.handlers = setHandlers(buyMenuHandlers, fonts)
         self.scan = ("", False)
+
+        self.emptyBasketText = fonts["30"].render("Panier vide !", 1, (250, 120, 120))
 
         self.functions = {buyMenuHandlers[0]: self.removeLast,
                           buyMenuHandlers[1]: None,
@@ -46,6 +48,8 @@ class BuyMenu(object):
         while self.buying:
             screen.blit(background, (0, 0))
 
+            if len(self.basket) == 0:
+                screen.blit(self.emptyBasketText, (SCREEN_X/2 - self.emptyBasketText.get_size()[0]/2, 250))
             for x in range(len(self.basket)):
                 self.basket[x].draw(screen, x, x+1==len(self.basket))
 
@@ -73,7 +77,10 @@ class BuyMenu(object):
                         print(results)
                         if results[0] != "":
                             print("Appening to the basket")
-                            self.basket.append(BasketElement(results[0], results[1], results[2]))
+                            if results[2] == "":
+                                self.basket.append(BasketElement(results[0], results[1]))
+                            else:
+                                self.basket.append(BasketElement(results[0], results[1], results[2]))
                     self.scan = "", False
 
             pygame.display.flip()
