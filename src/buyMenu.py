@@ -4,18 +4,29 @@ from pygame.locals import *
 from constants import *
 
 class BasketElement(object):
-    def __init__(self, name, image, price):
+    def __init__(self, name, price, image):
         self.name = name
         self.price = int(price)
 
         self.nameImage = fonts["30"].render(self.name, 1, (0, 0, 0))
-        self.priceImage = fonts["30"].render(str(self.price), 1, (0, 0, 0))
+        self.priceImage = fonts["30"].render(str(self.price)+"€", 1, (0, 0, 0))
         self.image = pygame.image.load(image)
-        self.scaledImage = pygame.transform.smoothscale()
+        coef = self.image.get_size()[1]/50
+        coef2 = self.image.get_size()[1]/120
+        self.scaledImage = pygame.transform.smoothscale(self.image, (int(self.image.get_size()[0]/coef), int(self.image.get_size()[1]/coef)))
+        self.image = pygame.transform.smoothscale(self.image, (int(self.image.get_size()[0]/coef2), int(self.image.get_size()[1]/coef2)))
 
     def draw(self, screen, nb, isLast=False):
         if not isLast:
-            pygame.draw.rectangle(screen, (0, 0, 0), pygame.Rect((362, 100+x*50), (300, 50)))
+            screen.blit(self.scaledImage, (312, 75+(nb+1)*50))
+            screen.blit(self.nameImage,   (355, 80+(nb+1)*50))
+            screen.blit(self.priceImage,  (700-self.priceImage.get_size()[0], 80+(nb+1)*50))
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect((312, 75+(nb+1)*50), (400, 51)), 1)
+        else:
+            screen.blit(self.nameImage,   (400, 95+(nb+1)*50))
+            screen.blit(self.priceImage,  (700-self.priceImage.get_size()[0], 95+(nb+1)*50))
+            screen.blit(self.image, (312, 75+(nb+1)*50))
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect((312, 75+(nb+1)*50), (400, 120)), 1)
 
 class BuyMenu(object):
     def __init__(self):
@@ -34,6 +45,10 @@ class BuyMenu(object):
     def run(self):
         while self.buying:
             screen.blit(background, (0, 0))
+
+            for x in range(len(self.basket)):
+                self.basket[x].draw(screen, x, x+1==len(self.basket))
+
             screen.blit(urlabBanner, (0, 0))
 
             for handler in self.handlers:
@@ -46,12 +61,19 @@ class BuyMenu(object):
                     exit()
                 self.scan = fetchScan(event, self.scan[0])
                 if self.scan[1]:
-                    print(self.scan)
-                    print(dataBase.fetch(self.scan))
+                    wasAction = False
                     for x in range(len(self.handlers)):
                         if self.handlers[x].match(self.scan[0]):
                             print("action : ", self.handlers[x].text)
+                            wasAction = True
                             self.functions[self.handlers[x].text]()
+                    if not wasAction:
+                        results = dataBase.fetch(self.scan[0])
+                        print(self.scan)
+                        print(results)
+                        if results[0] != "":
+                            print("Appening to the basket")
+                            self.basket.append(BasketElement(results[0], results[1], results[2]))
                     self.scan = "", False
 
             pygame.display.flip()

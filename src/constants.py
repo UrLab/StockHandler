@@ -35,7 +35,5 @@ buyMenuHandlers  = ["Annuler dernier", "", "Retour", "Vider", "", "Terminer"]
 
 #DATABASE
 dataBase = DataBase('data/db.json')
-dataBase.add("Club-Mate", "azerty", 2, "imgs/products/club_mate.png")
-dataBase.save()
 
 #Menus
