@@ -2,7 +2,7 @@
 
 ## DEKWA ?
 
-UrLab's Stock Handler c'est le programme de gestions des stocks/payement automatisé du HS, Le but est de fournir une interface où quelques clics suffisent à acheter quelque chose, tout en mettant à jour les stocks, pour créer des listes de course automatisées.
+UrLab's Stock Handler c'est le programme de gestions des stocks/payement automatisé du HS, Le but est de fournir une interface où quelques clics/scans suffisent à acheter quelque chose, tout en mettant à jour les stocks, pour créer des listes de course automatisées.
 
 ## Concretement
 
