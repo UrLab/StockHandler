@@ -1,6 +1,5 @@
 import pygame
 from pygame.locals import *
-import numpy as np
 import os
 import time
 import sys
@@ -16,6 +15,7 @@ def main():
     running = True
     eventHandlers = setHandlers(mainMenuHandlers, fonts)
     buyingMenu = BuyMenu()
+    title = fonts["30"].render("Choisissez une action", 1, (0, 0, 0))
 
     #Functions to call by scanning eventHandlers
     functions = {mainMenuHandlers[0]: buyingMenu.run,
@@ -28,6 +28,8 @@ def main():
     while running:
         screen.blit(background, (0, 0))
         screen.blit(urlabBanner, (0, 0))
+        screen.blit(title, (10, urlabBanner.get_size()[1]+10))
+        pygame.draw.line(screen, (125, 125, 125), (10, urlabBanner.get_size()[1]+title.get_size()[1]+10), (250, urlabBanner.get_size()[1]+title.get_size()[1]+10))
 
         for handler in eventHandlers:
             handler.draw(screen)
