@@ -29,7 +29,7 @@ def main():
         screen.blit(background, (0, 0))
         screen.blit(urlabBanner, (0, 0))
         screen.blit(title, (10, urlabBanner.get_size()[1]+10))
-        pygame.draw.line(screen, (125, 125, 125), (10, urlabBanner.get_size()[1]+title.get_size()[1]+10), (250, urlabBanner.get_size()[1]+title.get_size()[1]+10))
+        pygame.draw.line(screen, (125, 125, 125), (15, urlabBanner.get_size()[1]+title.get_size()[1]+10), (1009, urlabBanner.get_size()[1]+title.get_size()[1]+10))
 
         for handler in eventHandlers:
             handler.draw(screen)
@@ -44,7 +44,8 @@ def main():
                 for x in range(len(eventHandlers)):
                     if eventHandlers[x].match(scan[0]):
                         print("toCall ", eventHandlers[x].text)
-                        functions[eventHandlers[0].text]()
+                        if functions[eventHandlers[x].text]:
+                            functions[eventHandlers[x].text]()
                 scan = "", False
 
         pygame.display.flip()

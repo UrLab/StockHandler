@@ -24,6 +24,8 @@ for x in [14, 20, 25, 30, 35, 50, 75, 100]:
 #IMAGES MADE BY THE COMPUTER
 urlabBanner = CreateBanner(fonts, SCREEN_X)
 background = pygame.image.load("imgs/background.png")
+fromUrLabWithLove = fonts["14"].render("Made with love @ UrLab", 1, (0, 0, 0))
+background.blit(fromUrLabWithLove, (SCREEN_X-fromUrLabWithLove.get_size()[0], SCREEN_Y-fromUrLabWithLove.get_size()[1]))
 
 #HANDLERS
 mainMenuHandlers = ["Acheter", "Remplir", "Stock", "BDD", "", "Mon solde"]
