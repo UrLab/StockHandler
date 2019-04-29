@@ -75,21 +75,30 @@ class BuyMenu(object):
         self.buying = True
         self.basket = []
         self.handlers = setHandlers(buyMenuHandlers, fonts)
+        self.handlersNBC = setHandlers(buyMenuHandlersNBC, fonts)
         self.scan = ("", False)
         self.total = 0
         self.historyArticle = []
         self.alertMsgs = []
+        self.mainMenu = True
 
         self.emptyBasketText = fonts["30"].render("Votre panier est vide !", 1, (250, 120, 120))
         self.title = fonts["30"].render("Menu d'achat", 1, (0, 0, 0))
         self.basketText = fonts["25"].render("Votre panier :", 1, (0, 0, 0))
 
         self.functions = {buyMenuHandlers[0]: self.removeLast,
-                          buyMenuHandlers[1]: None,
+                          buyMenuHandlers[1]: self.noBarCode,
                           buyMenuHandlers[2]: self.Stop,
                           buyMenuHandlers[3]: self.EmptyBasket,
                           buyMenuHandlers[4]: None,
                           buyMenuHandlers[5]: self.Finish}
+
+        self.functionsNBC = {buyMenuHandlers[0]: self.addNBC,
+                             buyMenuHandlers[1]: self.addNBC,
+                             buyMenuHandlers[2]: None,
+                             buyMenuHandlers[3]: None,
+                             buyMenuHandlers[4]: None,
+                             buyMenuHandlers[5]: self.quitNBC}
 
     def run(self):
         while self.buying:
@@ -116,8 +125,12 @@ class BuyMenu(object):
             screen.blit(self.title, (10, urlabBanner.get_size()[1]+10))
             pygame.draw.line(screen, (125, 125, 125), (15, urlabBanner.get_size()[1]+self.title.get_size()[1]+10), (1009, urlabBanner.get_size()[1]+self.title.get_size()[1]+10))
 
-            for handler in self.handlers:
-                handler.draw(screen)
+            if self.mainMenu:
+                for handler in self.handlers:
+                    handler.draw(screen)
+            else:
+                for handler in self.handlersNBC:
+
 
             for msg in self.alertMsgs:
                 if msg.update(timeElapsed) == 1:
@@ -141,6 +154,12 @@ class BuyMenu(object):
             timeElapsed = time.time() - startTime
             startTime = time.time()
 
+    def startNBC(self): #Runs the NoBarCode Menu
+        self.mainMenu = False
+
+    def addNBC(product):
+
+
     #Gets the input from the scan and calls the function corresponding to the handler or add product in the shopping cart
     def handleScan(self):
         wasAction = False
@@ -151,33 +170,35 @@ class BuyMenu(object):
                 wasAction = True
                 if self.functions[self.handlers[x].text]:
                     self.functions[self.handlers[x].text]() #If the scan is about a linked handler, call the function linked to it
-
-        #If the scan is about a product
         if not wasAction:
-            results = dataBase.fetch(self.scan[0]) #Gives in order the Name, the price and a link to the image
-            print(self.scan)
-            print(results)
-            if results[0] != "":
-
-                self.historyArticle.append(results) #Keep an history to be able to remove last element
-
-                self.total += int(results[1]*100) #Add the price of the product
-                alreadyInBasket = False #Try to find if the last scanned product is already in the basket
-                for element in self.basket:
-                    if element.name == results[0]:
-                        element.addOne() #If it is, adds one to it
-                        alreadyInBasket = True
-
-                if not alreadyInBasket:
-                    if results[2] == "": #If no image is specified
-                        self.basket.append(BasketElement(results[0], results[1]))
-                    else:
-                        self.basket.append(BasketElement(results[0], results[1], results[2]))
-                self.updateTotalText()
-            else:
-                self.alertMsgs.append(AlertMsg("Aucun article trouvé, réessayez", 3))
+            self.addProduct()
 
         self.scan = "", False #Reinits the scan
+
+    def addProduct(self):
+        #If the scan is about a product
+        results = dataBase.fetch(self.scan[0]) #Gives in order the Name, the price and a link to the image
+        print(self.scan)
+        print(results)
+        if results[0] != "":
+
+            self.historyArticle.append(results) #Keep an history to be able to remove last element
+
+            self.total += int(results[1]*100) #Add the price of the product
+            alreadyInBasket = False #Try to find if the last scanned product is already in the basket
+            for element in self.basket:
+                if element.name == results[0]:
+                    element.addOne() #If it is, adds one to it
+                    alreadyInBasket = True
+
+            if not alreadyInBasket:
+                if results[2] == "": #If no image is specified
+                    self.basket.append(BasketElement(results[0], results[1]))
+                else:
+                    self.basket.append(BasketElement(results[0], results[1], results[2]))
+            self.updateTotalText()
+        else:
+            self.alertMsgs.append(AlertMsg("Aucun article trouvé, réessayez", 3))
 
     #Starts the transaction
     def Finish(self):
