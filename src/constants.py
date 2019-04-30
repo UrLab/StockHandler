@@ -29,7 +29,8 @@ background.blit(fromUrLabWithLove, (SCREEN_X-fromUrLabWithLove.get_size()[0], SC
 
 #HANDLERS
 mainMenuHandlers = ["Acheter", "Remplir", "Stock", "BDD", "", "Mon solde"]
-buyMenuHandlers  = ["Annuler dernier", "", "Retour", "Vider", "", "Terminer"]
+buyMenuHandlers  = ["Annuler dernier", "Article sans code barre", "Retour", "Vider", "", "Terminer"]
+buyMenuHandlersNBC  = ["Twix", "Mars", "", "", "", "Retour"]
 
 #DATABASE
 dataBase = DataBase('data/db.json')
