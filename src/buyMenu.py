@@ -93,13 +93,6 @@ class BuyMenu(object):
                           buyMenuHandlers[4]: None,
                           buyMenuHandlers[5]: self.Finish}
 
-        self.functionsNBC = {buyMenuHandlers[0]: self.addNBC,
-                             buyMenuHandlers[1]: self.addNBC,
-                             buyMenuHandlers[2]: None,
-                             buyMenuHandlers[3]: None,
-                             buyMenuHandlers[4]: None,
-                             buyMenuHandlers[5]: self.quitNBC}
-
     def run(self):
         while self.buying:
             startTime = time.time()
@@ -130,7 +123,7 @@ class BuyMenu(object):
                     handler.draw(screen)
             else:
                 for handler in self.handlersNBC:
-
+                    handler.draw(screen)
 
             for msg in self.alertMsgs:
                 if msg.update(timeElapsed) == 1:
@@ -157,19 +150,27 @@ class BuyMenu(object):
     def startNBC(self): #Runs the NoBarCode Menu
         self.mainMenu = False
 
-    def addNBC(product):
-
+    def noBarCode(self):
+        self.mainMenu = False
 
     #Gets the input from the scan and calls the function corresponding to the handler or add product in the shopping cart
     def handleScan(self):
         wasAction = False
         #Goes trough handlers to see if one was scanned
-        for x in range(len(self.handlers)):
-            if self.handlers[x].match(self.scan[0]):
-                print("action : ", self.handlers[x].text)
-                wasAction = True
-                if self.functions[self.handlers[x].text]:
-                    self.functions[self.handlers[x].text]() #If the scan is about a linked handler, call the function linked to it
+        if self.mainMenu:
+            for x in range(len(self.handlers)):
+                if self.handlers[x].match(self.scan[0]):
+                    wasAction = True
+                    if self.functions[self.handlers[x].text]:
+                        self.functions[self.handlers[x].text]() #If the scan is about a linked handler, call the function linked to it
+        else:
+            for x in range(len(self.handlersNBC)):
+                if self.handlersNBC[x].match(self.scan[0]):
+                    if self.handlersNBC[x].text != "Retour":
+                        self.scan = self.handlersNBC[x].text, True
+                    else:
+                        wasAction = True
+                        self.mainMenu = True
         if not wasAction:
             self.addProduct()
 
